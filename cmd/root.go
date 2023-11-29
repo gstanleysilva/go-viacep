@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/guhstanley/go-viacep/internal/services"
 	"github.com/spf13/cobra"
 )
 
@@ -23,7 +24,24 @@ to quickly create a Cobra application.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Hello")
+		srv, err := services.NewViaCepService()
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+		url := srv.GetJsonURL("30575460")
+		viacep, err := srv.Execute(url)
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+
+		fmt.Println("ViaCEP Information:")
+		fmt.Printf("CEP: %v \n", viacep.Cep)
+		fmt.Printf("Localidade: %v \n", viacep.Localidade)
+		fmt.Printf("UF: %v \n", viacep.Uf)
+		fmt.Printf("Bairro: %v \n", viacep.Bairro)
+		fmt.Printf("Logradouro: %v \n", viacep.Logradouro)
 	},
 }
 
