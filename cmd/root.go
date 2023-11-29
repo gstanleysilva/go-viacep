@@ -11,28 +11,31 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var cepString string
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "go-viacep",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
+	Short: "Via CEP API",
+	Long:  `Get Brazilian postal code coming from the ViaCEP API`,
 	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("Loading...")
+
 		srv, err := services.NewViaCepService()
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Fprintf(os.Stderr, "%v\n", err)
 			return
 		}
-		url := srv.GetJsonURL("30575460")
-		viacep, err := srv.Execute(url)
+
+		url, err := srv.GetJsonURL(cepString)
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Fprintf(os.Stderr, "%v\n", err)
+			return
+		}
+
+		viacep, err := srv.Execute(*url)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "%v\n", err)
 			return
 		}
 
@@ -55,13 +58,7 @@ func Execute() {
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.go-viacep.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	//Flags definition
+	rootCmd.Flags().StringVarP(&cepString, "cep", "c", "", "CEP number")
+	rootCmd.MarkFlagRequired("cep")
 }

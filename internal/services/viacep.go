@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -23,8 +24,14 @@ func NewViaCepService() (*ViaCepService, error) {
 	}, nil
 }
 
-func (v *ViaCepService) GetJsonURL(cep string) string {
-	return v.BaseUrl + cep + "/json/"
+func (v *ViaCepService) GetJsonURL(cep string) (*string, error) {
+	if cep == "" {
+		return nil, errors.New("invalid cep")
+	}
+
+	url := v.BaseUrl + cep + "/json/"
+
+	return &url, nil
 }
 
 func (v *ViaCepService) Execute(url string) (*models.ViaCep, error) {
